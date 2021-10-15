@@ -1,0 +1,17 @@
+{
+	"name": "MIGRATIONS 4D",
+	"description": "",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./",
+	"projects": [],
+	"scripts": [
+		{
+			"migration": "./win32/debug/Migration4D.exe migration:run"
+		}
+	],
+	"dependencies": {
+		"github.com/cachopaweb/factory-connections": "^1.0.1",
+		"github.com/hashload/horse": "^v2.0.14"
+	}
+}

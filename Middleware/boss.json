@@ -1,0 +1,12 @@
+{
+	"name": "Middleware",
+	"description": "",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./",
+	"projects": [],
+	"dependencies": {
+		"github.com/cachopaweb/factory-connections": "^1.0.1",
+		"github.com/hashload/horse": "^v2.0.14"
+	}
+}

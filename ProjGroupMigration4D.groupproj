@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{524CC1FD-6BA5-45BB-B594-239738DDE968}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Middleware\HorseMigration4D.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CLI\Migration4D.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="HorseMigration4D">
+        <MSBuild Projects="Middleware\HorseMigration4D.dproj"/>
+    </Target>
+    <Target Name="HorseMigration4D:Clean">
+        <MSBuild Projects="Middleware\HorseMigration4D.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="HorseMigration4D:Make">
+        <MSBuild Projects="Middleware\HorseMigration4D.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Migration4D">
+        <MSBuild Projects="CLI\Migration4D.dproj"/>
+    </Target>
+    <Target Name="Migration4D:Clean">
+        <MSBuild Projects="CLI\Migration4D.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Migration4D:Make">
+        <MSBuild Projects="CLI\Migration4D.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="HorseMigration4D;Migration4D"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="HorseMigration4D:Clean;Migration4D:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="HorseMigration4D:Make;Migration4D:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
