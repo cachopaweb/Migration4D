@@ -3,17 +3,18 @@ unit Horse.Migration4D;
 interface
 
 uses Horse,
+     UnitMigration4D.Interfaces,
      System.Generics.Collections;
 
 type
   TMiddlewareMigration = class
   private
-    procedure Run;
+    procedure Run(Driver: iDriver);
   public
     class function New: TMiddlewareMigration;
   end;
 
-function HorseMigration4D: THorseCallback;
+function HorseMigration4D(Driver: iDriver): THorseCallback;
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 
 implementation
@@ -22,9 +23,9 @@ uses UnitMigration4D.Commands.Types,
      UnitRegisterClass.Model,
      System.SysUtils;
 
-function HorseMigration4D: THorseCallback;
+function HorseMigration4D(Driver: iDriver): THorseCallback;
 begin
-  TMiddlewareMigration.New.Run;
+  TMiddlewareMigration.New.Run(Driver);
   Result := Middleware;
 end;
 
@@ -44,7 +45,7 @@ begin
   Result := Self.Create;
 end;
 
-procedure TMiddlewareMigration.Run;
+procedure TMiddlewareMigration.Run(Driver: iDriver);
 var
   ClassesRegistradas: TList<TClass>;
   aClass: TClass;
@@ -53,11 +54,11 @@ begin
   for aClass in ClassesRegistradas do
   begin
     try
-      InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Run);
+      TMigrationsCommans.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Run, Driver);
     except
       on E: Exception do
       begin
-        InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Revert);
+        TMigrationsCommans.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Revert, Driver);
         Writeln('[Error] Execute migration failure. '+E.Message);
       end;
     end;
