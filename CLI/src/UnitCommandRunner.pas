@@ -52,7 +52,7 @@ begin
   SourceCodeUnit := TStringList.Create;
   try
     try
-      SourceCodeUnit.Add('Unit UnitMigration.[NAME];');
+      SourceCodeUnit.Add('Unit Unit[TIMESTAMP].[NAME];');
       SourceCodeUnit.Add('');
       SourceCodeUnit.Add('interface');
       SourceCodeUnit.Add('');
@@ -62,7 +62,7 @@ begin
       SourceCodeUnit.Add('  UnitRegisterClass.Model;');
       SourceCodeUnit.Add('');
       SourceCodeUnit.Add('type');
-      SourceCodeUnit.Add('  TMigration[NAME] = class');
+      SourceCodeUnit.Add('  T[NAME][TIMESTAMP] = class');
       SourceCodeUnit.Add('  private');
       SourceCodeUnit.Add('  public');
       SourceCodeUnit.Add('    procedure Up(QueryRunner: iQueryRunner);');
@@ -71,44 +71,48 @@ begin
       SourceCodeUnit.Add('');
       SourceCodeUnit.Add('implementation');
       SourceCodeUnit.Add('');
-      SourceCodeUnit.Add('{ TMigration[NAME]  }');
+      SourceCodeUnit.Add('{ T[NAME][TIMESTAMP]  }');
       SourceCodeUnit.Add('');
       SourceCodeUnit.Add('uses');
       SourceCodeUnit.Add('  UnitTable.Model,');
       SourceCodeUnit.Add('  UnitQueryRunner.Model;');
       SourceCodeUnit.Add('');
-      SourceCodeUnit.Add('procedure TMigration[NAME].Up(QueryRunner: iQueryRunner);');
+      SourceCodeUnit.Add('procedure T[NAME][TIMESTAMP].Up(QueryRunner: iQueryRunner);');
       SourceCodeUnit.Add('begin');
-      SourceCodeUnit.Add('  QueryRunner.CreateTable(');
-      SourceCodeUnit.Add('    TTable.New');
-      SourceCodeUnit.Add('      .SetName(''[TABLE_NAME]'')');
-      SourceCodeUnit.Add('      .Fields');
-      SourceCodeUnit.Add('        .AddCollumn('''+Name.ToUpper.Substring(0, 3)+'_CODIGO'', ''INTEGER NOT NULL PRIMARY KEY'')');
-      SourceCodeUnit.Add('        .AddCollumn('''+Name.ToUpper.Substring(0, 3)+'_NOME'', ''VARCHAR(50)'')');
-      SourceCodeUnit.Add('      .&End');
-      SourceCodeUnit.Add('  );');
+      SourceCodeUnit.Add('//  QueryRunner.CreateTable(');
+      SourceCodeUnit.Add('//    TTable.New');
+      SourceCodeUnit.Add('//      .SetName(''[TABLE_NAME]'')');
+      SourceCodeUnit.Add('//      .Fields');
+      SourceCodeUnit.Add('//        .AddCollumn(''[COLUMN_PREFIX]_ID'', ''INTEGER NOT NULL PRIMARY KEY'')');
+      SourceCodeUnit.Add('//        .AddCollumn(''[COLUMN_PREFIX]_NAME'', ''VARCHAR(50)'')');
+      SourceCodeUnit.Add('//      .&End');
+      SourceCodeUnit.Add('//  );');
+      SourceCodeUnit.Add('//  QueryRunner.CreateColumn(''[TABLE_NAME]'', ''[COLUMN_PREFIX]_NAME'', ''VARCHAR(50)'');}');
       SourceCodeUnit.Add('end;');
       SourceCodeUnit.Add('');
-      SourceCodeUnit.Add('procedure TMigration[NAME].Down(QueryRunner: iQueryRunner);');
+      SourceCodeUnit.Add('procedure T[NAME][TIMESTAMP].Down(QueryRunner: iQueryRunner);');
       SourceCodeUnit.Add('begin');
-      SourceCodeUnit.Add('  QueryRunner.DropTable(''[TABLE_NAME]'');');
+      SourceCodeUnit.Add('//  QueryRunner.DropTable(''[TABLE_NAME]'');');
+      SourceCodeUnit.Add('//  QueryRunner.DropColumn(''[COLUMN_PREFIX]_NAME'');');
       SourceCodeUnit.Add('end;');
       SourceCodeUnit.Add('');
       SourceCodeUnit.Add('initialization');
-      SourceCodeUnit.Add('  TRegisterClasses.Registry(TMigration[NAME]);');
+      SourceCodeUnit.Add('  TRegisterClasses.Registry(T[NAME][TIMESTAMP]);');
       SourceCodeUnit.Add('');
       SourceCodeUnit.Add('end.');
 
       //replace for name migration
-      SourceCodeUnit.Text := SourceCodeUnit.Text.Replace('[NAME]', Name.ToUpper+FormatDateTime('yyymmdd', Date));
-      SourceCodeUnit.Text := SourceCodeUnit.Text.Replace('[TABLE_NAME]', Name.ToUpper);
+      SourceCodeUnit.Text := SourceCodeUnit.Text.Replace('[NAME]', Name.ToUpper);
+      SourceCodeUnit.Text := SourceCodeUnit.Text.Replace('[TIMESTAMP]', FormatDateTime('yyymmdd', Date));
+      SourceCodeUnit.Text := SourceCodeUnit.Text.Replace('[TABLE_NAME]', 'CLIENTS');
+      SourceCodeUnit.Text := SourceCodeUnit.Text.Replace('[COLUMN_PREFIX]', 'CLI');
       if not DirectoryExists(DirectoryMigrations) then
         CreateDir(DirectoryMigrations);
-      Assign(Arq, DirectoryMigrations+'/'+Format('UnitMigration.%s.pas', [Name.ToUpper+FormatDateTime('yyymmdd', Date)]));
+      Assign(Arq, DirectoryMigrations+'/'+Format('Unit%s.%s.pas', [FormatDateTime('yyymmdd', Date), Name.ToUpper]));
       Rewrite(Arq);
       Write(Arq, SourceCodeUnit.Text);
       CloseFile(Arq);
-      Writeln(Format('UnitMigration.%s.pas', [Name.ToUpper+FormatDateTime('yyymmdd', Date)])+' Created Success!'+sLineBreak);
+      Writeln(Format('Unit%s.%s.pas', [FormatDateTime('yyymmdd', Date), Name.ToUpper])+' Created Success!'+sLineBreak);
     except on E: Exception do
       raise Exception.Create('Error try create UnitMigration');
     end;
@@ -159,7 +163,7 @@ var
   Command: TMigrationCommandsTypes;
 begin
   rttiContext := TRttiContext.Create;
-  Command := StrToMigrationCommandsTypes(ParamStr(1));
+  Command := TMigrationCommands.StrToMigrationCommandsTypes(ParamStr(1));
   try
     rttiType       := rttiContext.GetType(Self.NewInstance.ClassType).AsInstance;
     rttiNew        := rttiType.GetMethod('Create');

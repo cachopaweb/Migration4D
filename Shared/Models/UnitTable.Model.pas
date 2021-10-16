@@ -19,7 +19,7 @@ type
     function AddCollumn(Name: string; atype: string): iCollumn;
     function &End: iTable;
     function Name: string;
-    function Collumns: TDictionary<string, string>;
+    function GetColumns: TDictionary<string, string>;
     function Fields: iCollumn;
   end;
 
@@ -37,7 +37,7 @@ begin
   Result := Self;
 end;
 
-function TTable.Collumns: TDictionary<string, string>;
+function TTable.GetColumns: TDictionary<string, string>;
 begin
   Result := FCollumns;
 end;

@@ -40,6 +40,8 @@ contains
   UnitTable.Model in '..\Shared\Models\UnitTable.Model.pas',
   UnitMigration4D.Interfaces in '..\Shared\Interfaces\UnitMigration4D.Interfaces.pas',
   UnitFirebird.Driver in '..\Shared\Drivers\Firebird\UnitFirebird.Driver.pas',
-  UnitDatabase in '..\Shared\Drivers\Firebird\Database\UnitDatabase.pas';
+  UnitDatabase in '..\Shared\Drivers\Firebird\Database\UnitDatabase.pas',
+  UnitFactoryDriver in '..\Shared\Factory\UnitFactoryDriver.pas',
+  UnitMigrations.Model in '..\Shared\Models\UnitMigrations.Model.pas';
 
 end.

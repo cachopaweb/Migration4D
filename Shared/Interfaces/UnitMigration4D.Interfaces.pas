@@ -3,9 +3,11 @@ unit UnitMigration4D.Interfaces;
 interface
 
 uses
-  System.Generics.Collections;
+  System.Generics.Collections,
+  UnitMigrations.Model;
 
 type
+  TTipoDriver = (Firebird, Postgres);
   iTable = interface;
 
   iCollumn = interface
@@ -19,7 +21,7 @@ type
     function SetName(Value: string): iTable;
     function Name: string;
     function Fields: iCollumn;
-    function Collumns: TDictionary<string, string>;
+    function GetColumns: TDictionary<string, string>;
   end;
 
   iDriver = interface
@@ -28,6 +30,14 @@ type
     function DropTable(Value: string): iDriver;
     function CreateColumn(TableName: string; ColumnName: string; ColumnType: string): iDriver;
     function DropColumn(TableName: string; ColumnName: string): iDriver;
+    procedure InsertMigrationsExecuted(ClassName: string);
+    procedure RemoveMigrationsExecuted(ClassName: string);
+    function GetAllMigrationsExecuted: TList<TMigrationsModel>;
+  end;
+
+  iFactoryDriver = interface
+    ['{6114B976-BA52-4953-82CA-B38346D0C42A}']
+    function GetDriver(Value: TTipoDriver): iDriver;
   end;
 
   iQueryRunner = interface

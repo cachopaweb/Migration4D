@@ -88,6 +88,8 @@
         <DCCReference Include="..\Shared\Interfaces\UnitMigration4D.Interfaces.pas"/>
         <DCCReference Include="..\Shared\Drivers\Firebird\UnitFirebird.Driver.pas"/>
         <DCCReference Include="..\Shared\Drivers\Firebird\Database\UnitDatabase.pas"/>
+        <DCCReference Include="..\Shared\Factory\UnitFactoryDriver.pas"/>
+        <DCCReference Include="..\Shared\Models\UnitMigrations.Model.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -3,29 +3,48 @@ unit Horse.Migration4D;
 interface
 
 uses Horse,
-     UnitMigration4D.Interfaces,
-     System.Generics.Collections;
+     System.Generics.Defaults,
+     System.Generics.Collections,
+     UnitMigration4D.Interfaces;
 
 type
+  {$SCOPEDENUMS ON}
+  TCommand = (Run, Revert);
+  {$SCOPEDENUMS OFF}
+
   TMiddlewareMigration = class
   private
-    procedure Run(Driver: iDriver);
+    class function StrToTipoDriver(Value: string): TTipoDriver;
   public
+    procedure Run(Driver: iDriver);
+    procedure Revert(Driver: iDriver);
     class function New: TMiddlewareMigration;
   end;
 
-function HorseMigration4D(Driver: iDriver): THorseCallback;
+function HorseMigration4D(Command: TCommand = TCommand.Run): THorseCallback;
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 
 implementation
 
 uses UnitMigration4D.Commands.Types,
      UnitRegisterClass.Model,
-     System.SysUtils;
+     System.SysUtils,
+     UnitConfiguration.Model,
+     UnitMigration4D.Utils,
+     UnitMigrations.Model,
+     UnitFactoryDriver;
 
-function HorseMigration4D(Driver: iDriver): THorseCallback;
+function HorseMigration4D(Command: TCommand = TCommand.Run): THorseCallback;
+var
+  TipoDriver: TTipoDriver;
+  Driver: iDriver;
 begin
-  TMiddlewareMigration.New.Run(Driver);
+  TipoDriver :=  TMiddlewareMigration.StrToTipoDriver(TConfiguration.New.fromJson.Driver);
+  Driver := TFactoryDriver.New.GetDriver(TipoDriver);
+  if Command = TCommand.Run then
+    TMiddlewareMigration.New.Run(Driver);
+  if Command = TCommand.Revert then
+    TMiddlewareMigration.New.Revert(Driver);
   Result := Middleware;
 end;
 
@@ -45,24 +64,72 @@ begin
   Result := Self.Create;
 end;
 
-procedure TMiddlewareMigration.Run(Driver: iDriver);
+procedure TMiddlewareMigration.Revert(Driver: iDriver);
 var
   ClassesRegistradas: TList<TClass>;
   aClass: TClass;
+  Migration: TMigrationsModel;
+  MigrationsExecuteds: TList<TMigrationsModel>;
+  aClassesRegistradas: TArray<TClass>;
 begin
+  MigrationsExecuteds := Driver.GetAllMigrationsExecuted;
   ClassesRegistradas := TRegisterClasses.GetClasses;
+  aClassesRegistradas := ClassesRegistradas.ToArray;
+  TArray.Sort<TClass>(aClassesRegistradas);
   for aClass in ClassesRegistradas do
   begin
+    for Migration in MigrationsExecuteds do
+    begin
+      if Migration.Name <> aClass.ClassName then
+        Continue;
+    end;
     try
-      TMigrationsCommans.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Run, Driver);
+      TMigrationCommands.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Revert, Driver);
     except
       on E: Exception do
       begin
-        TMigrationsCommans.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Revert, Driver);
         Writeln('[Error] Execute migration failure. '+E.Message);
       end;
     end;
   end;
+end;
+
+procedure TMiddlewareMigration.Run(Driver: iDriver);
+var
+  ClassesRegistradas: TList<TClass>;
+  aClass: TClass;
+  MigrationsExecuteds: TList<TMigrationsModel>;
+  Migration: TMigrationsModel;
+  aClassesRegistradas: TArray<TClass>;
+begin
+  MigrationsExecuteds := Driver.GetAllMigrationsExecuted;
+  ClassesRegistradas := TRegisterClasses.GetClasses;
+  aClassesRegistradas := ClassesRegistradas.ToArray;
+  TArray.Sort<TClass>(aClassesRegistradas);
+  for aClass in aClassesRegistradas do
+  begin
+    for Migration in MigrationsExecuteds do
+    begin
+      if Migration.Name = aClass.ClassName then
+        Continue;
+    end;
+    try
+      TMigrationCommands.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Run, Driver);
+    except
+      on E: Exception do
+      begin
+        TMigrationCommands.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Revert, Driver);
+        Writeln('[Error] Execute migration failure. '+E.Message);
+      end;
+    end;
+  end;
+end;
+
+class function TMiddlewareMigration.StrToTipoDriver(Value: string): TTipoDriver;
+var
+  ok: Boolean;
+begin
+  Result := StrToEnumerado(ok, Value, ['FB', 'PG'], [TTipoDriver.Firebird, TTipoDriver.Postgres]);
 end;
 
 end.

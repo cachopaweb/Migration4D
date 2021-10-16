@@ -15,7 +15,9 @@ uses
   UnitQueryRunner.Model in '..\Shared\Models\UnitQueryRunner.Model.pas',
   UnitRegisterClass.Model in '..\Shared\Models\UnitRegisterClass.Model.pas',
   UnitTable.Model in '..\Shared\Models\UnitTable.Model.pas',
-  UnitMigration4D.Utils in '..\Shared\Utils\UnitMigration4D.Utils.pas';
+  UnitMigration4D.Utils in '..\Shared\Utils\UnitMigration4D.Utils.pas',
+  UnitFactoryDriver in '..\Shared\Factory\UnitFactoryDriver.pas',
+  UnitMigrations.Model in '..\Shared\Models\UnitMigrations.Model.pas';
 
 begin
   try
