@@ -18,6 +18,7 @@ begin
   //run migrations based in file configuration    
   //Migration4D.json, generated with command CLI "Migration4D Init"
   //Run generated migrations with command CLI "Migration4D migration:create -n name"
+  //Add migrations generated on directory Migrations in your project Exe: Add to Project Shift+F11
 
   THorse.Get('/ping',
     procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
