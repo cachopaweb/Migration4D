@@ -3,7 +3,7 @@ Generate Migrations for Delphi and Framework Horse
 
 ### For install CLI Migration4D using [boss](https://github.com/HashLoad/boss):
 ``` sh
-$ boss install -g github.com/CachopaWeb/Migration4D
+$ boss install github.com/CachopaWeb/Migration4D
 ```
 
 Sample Horse Server
