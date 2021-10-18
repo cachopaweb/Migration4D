@@ -3,14 +3,14 @@ unit Horse.Migration4D;
 interface
 
 uses Horse,
-     System.Generics.Defaults,
-     System.Generics.Collections,
-     UnitMigration4D.Interfaces;
+  System.Generics.Defaults,
+  System.Generics.Collections,
+  UnitMigration4D.Interfaces;
 
 type
-  {$SCOPEDENUMS ON}
+{$SCOPEDENUMS ON}
   TCommand = (Run, Revert);
-  {$SCOPEDENUMS OFF}
+{$SCOPEDENUMS OFF}
 
   TMiddlewareMigration = class
   private
@@ -27,20 +27,20 @@ procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 implementation
 
 uses UnitMigration4D.Commands.Types,
-     UnitRegisterClass.Model,
-     System.SysUtils,
-     UnitConfiguration.Model,
-     UnitMigration4D.Utils,
-     UnitMigrations.Model,
-     UnitFactoryDriver;
+  UnitRegisterClass.Model,
+  System.SysUtils,
+  UnitConfiguration.Model,
+  UnitMigration4D.Utils,
+  UnitMigrations.Model,
+  UnitFactoryDriver;
 
 function HorseMigration4D(Command: TCommand = TCommand.Run): THorseCallback;
 var
   TipoDriver: TTipoDriver;
   Driver: iDriver;
 begin
-  TipoDriver :=  TMiddlewareMigration.StrToTipoDriver(TConfiguration.New.fromJson.Driver);
-  Driver := TFactoryDriver.New.GetDriver(TipoDriver);
+  TipoDriver := TMiddlewareMigration.StrToTipoDriver(TConfiguration.New.fromJson.Driver);
+  Driver     := TFactoryDriver.New.GetDriver(TipoDriver);
   if Command = TCommand.Run then
     TMiddlewareMigration.New.Run(Driver);
   if Command = TCommand.Revert then
@@ -69,26 +69,19 @@ var
   ClassesRegistradas: TList<TClass>;
   aClass: TClass;
   Migration: TMigrationsModel;
-  MigrationsExecuteds: TList<TMigrationsModel>;
   aClassesRegistradas: TArray<TClass>;
 begin
-  MigrationsExecuteds := Driver.GetAllMigrationsExecuted;
-  ClassesRegistradas := TRegisterClasses.GetClasses;
+  ClassesRegistradas  := TRegisterClasses.GetClasses;
   aClassesRegistradas := ClassesRegistradas.ToArray;
   TArray.Sort<TClass>(aClassesRegistradas);
   for aClass in ClassesRegistradas do
   begin
-    for Migration in MigrationsExecuteds do
-    begin
-      if Migration.Name <> aClass.ClassName then
-        Continue;
-    end;
     try
       TMigrationCommands.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Revert, Driver);
     except
       on E: Exception do
       begin
-        Writeln('[Error] Execute migration failure. '+E.Message);
+        Writeln('[Error] Execute migration failure. ' + E.Message);
       end;
     end;
   end;
@@ -98,28 +91,26 @@ procedure TMiddlewareMigration.Run(Driver: iDriver);
 var
   ClassesRegistradas: TList<TClass>;
   aClass: TClass;
-  MigrationsExecuteds: TList<TMigrationsModel>;
+  MigrationsExecuteds: TList<string>;
   Migration: TMigrationsModel;
   aClassesRegistradas: TArray<TClass>;
 begin
   MigrationsExecuteds := Driver.GetAllMigrationsExecuted;
-  ClassesRegistradas := TRegisterClasses.GetClasses;
+  ClassesRegistradas  := TRegisterClasses.GetClasses;
   aClassesRegistradas := ClassesRegistradas.ToArray;
   TArray.Sort<TClass>(aClassesRegistradas);
   for aClass in aClassesRegistradas do
   begin
-    for Migration in MigrationsExecuteds do
+    if not MigrationsExecuteds.Contains(aClass.ClassName) then
     begin
-      if Migration.Name = aClass.ClassName then
-        Continue;
-    end;
-    try
-      TMigrationCommands.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Run, Driver);
-    except
-      on E: Exception do
-      begin
-        TMigrationCommands.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Revert, Driver);
-        Writeln('[Error] Execute migration failure. '+E.Message);
+      try
+        TMigrationCommands.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Run, Driver);
+      except
+        on E: Exception do
+        begin
+          TMigrationCommands.InvokeMethodsClasses(aClass, TMigrationCommandsTypes.Revert, Driver);
+          Writeln('[Error] Execute migration failure. ' + E.Message);
+        end;
       end;
     end;
   end;

@@ -22,7 +22,7 @@ type
     function DropColumn(TableName, ColumnName: string): iDriver;
     procedure InsertMigrationsExecuted(ClassName: string);
     procedure RemoveMigrationsExecuted(ClassName: string);
-    function GetAllMigrationsExecuted: TList<TMigrationsModel>;
+    function GetAllMigrationsExecuted: TList<string>;
   end;
 
 implementation
@@ -141,27 +141,23 @@ begin
   end;
 end;
 
-function TFirebirdDriver.GetAllMigrationsExecuted: TList<TMigrationsModel>;
+function TFirebirdDriver.GetAllMigrationsExecuted: TList<string>;
 var
   Query: iQuery;
-  Migration: TMigrationsModel;
 begin
-  Result := TList<TMigrationsModel>.Create;
+  Result := TList<string>.Create;
   Query  := TDatabase.Query;
   Query.Open('SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$RELATION_NAME = ''MIGRATIONS''');
   if not Query.DataSet.IsEmpty then
   begin
     Query := TDatabase.Query;
-    Query.Open('SELECT ID, NAME FROM MIGRATIONS');
+    Query.Open('SELECT NAME FROM MIGRATIONS');
     if not Query.DataSet.IsEmpty then
     begin
       Query.DataSet.First;
       while not Query.DataSet.Eof do
       begin
-        Migration      := TMigrationsModel.Create;
-        Migration.id   := Query.DataSet.FieldByName('ID').AsInteger;
-        Migration.Name := Query.DataSet.FieldByName('NAME').AsString;
-        Result.Add(Migration);
+        Result.Add(Query.DataSet.FieldByName('NAME').AsString);
         Query.DataSet.Next;
       end;
     end;

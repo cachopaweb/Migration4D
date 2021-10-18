@@ -32,7 +32,7 @@ type
     function DropColumn(TableName: string; ColumnName: string): iDriver;
     procedure InsertMigrationsExecuted(ClassName: string);
     procedure RemoveMigrationsExecuted(ClassName: string);
-    function GetAllMigrationsExecuted: TList<TMigrationsModel>;
+    function GetAllMigrationsExecuted: TList<string>;
   end;
 
   iFactoryDriver = interface
