@@ -3,9 +3,9 @@ unit Horse.Migration4D;
 interface
 
 uses Horse,
-  System.Generics.Defaults,
-  System.Generics.Collections,
-  UnitMigration4D.Interfaces;
+     System.Generics.Defaults,
+     System.Generics.Collections,
+     UnitMigration4D.Interfaces;
 
 type
 {$SCOPEDENUMS ON}
@@ -27,12 +27,12 @@ procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 implementation
 
 uses UnitMigration4D.Commands.Types,
-  UnitRegisterClass.Model,
-  System.SysUtils,
-  UnitConfiguration.Model,
-  UnitMigration4D.Utils,
-  UnitMigrations.Model,
-  UnitFactoryDriver;
+     UnitRegisterClass.Model,
+     System.SysUtils,
+     UnitConfiguration.Model,
+     UnitMigration4D.Utils,
+     UnitMigrations.Model,
+     UnitFactoryDriver;
 
 function HorseMigration4D(Command: TCommand = TCommand.Run): THorseCallback;
 var
@@ -50,11 +50,7 @@ end;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 begin
-  try
-
-  finally
-    Next;
-  end;
+  Next();
 end;
 
 { TMiddlewareMigration }

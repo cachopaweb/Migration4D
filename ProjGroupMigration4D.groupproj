@@ -6,7 +6,7 @@
         <Projects Include="Middleware\HorseMigration4D.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="CLI\Migration4D.dproj">
+        <Projects Include="CommandLine\Migration4D.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -27,13 +27,13 @@
         <MSBuild Projects="Middleware\HorseMigration4D.dproj" Targets="Make"/>
     </Target>
     <Target Name="Migration4D">
-        <MSBuild Projects="CLI\Migration4D.dproj"/>
+        <MSBuild Projects="CommandLine\Migration4D.dproj"/>
     </Target>
     <Target Name="Migration4D:Clean">
-        <MSBuild Projects="CLI\Migration4D.dproj" Targets="Clean"/>
+        <MSBuild Projects="CommandLine\Migration4D.dproj" Targets="Clean"/>
     </Target>
     <Target Name="Migration4D:Make">
-        <MSBuild Projects="CLI\Migration4D.dproj" Targets="Make"/>
+        <MSBuild Projects="CommandLine\Migration4D.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="HorseMigration4D;Migration4D"/>
