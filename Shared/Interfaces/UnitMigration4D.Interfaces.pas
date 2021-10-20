@@ -7,7 +7,7 @@ uses
   UnitMigrations.Model;
 
 type
-  TTipoDriver = (Firebird, Postgres);
+  TTypeDriver = (Firebird, Postgres);
   iTable = interface;
 
   iCollumn = interface
@@ -37,7 +37,7 @@ type
 
   iFactoryDriver = interface
     ['{6114B976-BA52-4953-82CA-B38346D0C42A}']
-    function GetDriver(Value: TTipoDriver): iDriver;
+    function GetDriver: iDriver;
   end;
 
   iQueryRunner = interface

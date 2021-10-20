@@ -3,9 +3,9 @@ unit Horse.Migration4D;
 interface
 
 uses Horse,
-     System.Generics.Defaults,
-     System.Generics.Collections,
-     UnitMigration4D.Interfaces;
+  System.Generics.Defaults,
+  System.Generics.Collections,
+  UnitMigration4D.Interfaces;
 
 type
 {$SCOPEDENUMS ON}
@@ -13,8 +13,6 @@ type
 {$SCOPEDENUMS OFF}
 
   TMiddlewareMigration = class
-  private
-    class function StrToTipoDriver(Value: string): TTipoDriver;
   public
     procedure Run(Driver: iDriver);
     procedure Revert(Driver: iDriver);
@@ -26,21 +24,18 @@ procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 
 implementation
 
-uses UnitMigration4D.Commands.Types,
-     UnitRegisterClass.Model,
-     System.SysUtils,
-     UnitConfiguration.Model,
-     UnitMigration4D.Utils,
-     UnitMigrations.Model,
-     UnitFactoryDriver;
+uses
+  UnitMigration4D.Commands.Types,
+  UnitRegisterClass.Model,
+  System.SysUtils,
+  UnitMigrations.Model,
+  UnitFactoryDriver;
 
 function HorseMigration4D(Command: TCommand = TCommand.Run): THorseCallback;
 var
-  TipoDriver: TTipoDriver;
   Driver: iDriver;
 begin
-  TipoDriver := TMiddlewareMigration.StrToTipoDriver(TConfiguration.New.fromJson.Driver);
-  Driver     := TFactoryDriver.New.GetDriver(TipoDriver);
+  Driver := TFactoryDriver.New.GetDriver;
   if Command = TCommand.Run then
     TMiddlewareMigration.New.Run(Driver);
   if Command = TCommand.Revert then
@@ -110,13 +105,6 @@ begin
       end;
     end;
   end;
-end;
-
-class function TMiddlewareMigration.StrToTipoDriver(Value: string): TTipoDriver;
-var
-  ok: Boolean;
-begin
-  Result := StrToEnumerado(ok, Value, ['FB', 'PG'], [TTipoDriver.Firebird, TTipoDriver.Postgres]);
 end;
 
 end.
